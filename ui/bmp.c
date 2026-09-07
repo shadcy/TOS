@@ -79,12 +79,12 @@ uint16_t *bmp_decode_mem(const uint8_t *data, uint32_t len, int *out_w, int *out
                 uint8_t b = row[x * 3 + 0];
                 uint8_t g = row[x * 3 + 1];
                 uint8_t r = row[x * 3 + 2];
-                c16 = (uint16_t)(((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3));
+                c16 = rgb565(r, g, b);
             } else if (bpp == 32) {
                 uint8_t b = row[x * 4 + 0];
                 uint8_t g = row[x * 4 + 1];
                 uint8_t r = row[x * 4 + 2];
-                c16 = (uint16_t)(((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3));
+                c16 = rgb565(r, g, b);
             }
             img_buf[y * w + x] = c16;
         }

@@ -5,21 +5,7 @@ import sys
 def convert_to_16bit_bmp(input_path, output_path, target_width=1024, target_height=768):
     img = Image.open(input_path).convert('RGB')
     
-    # Resize and crop to target_width x target_height
-    img_ratio = img.width / img.height
-    target_ratio = target_width / target_height
-    
-    if img_ratio > target_ratio:
-        # Image is wider, crop width
-        new_width = int(target_ratio * img.height)
-        offset = (img.width - new_width) // 2
-        img = img.crop((offset, 0, offset + new_width, img.height))
-    else:
-        # Image is taller, crop height
-        new_height = int(img.width / target_ratio)
-        offset = (img.height - new_height) // 2
-        img = img.crop((0, offset, img.width, offset + new_height))
-        
+    # Resize directly to target_width x target_height to preserve the entire image exact as is
     img = img.resize((target_width, target_height), Image.Resampling.LANCZOS)
     
     width, height = img.size
@@ -56,8 +42,8 @@ def convert_to_16bit_bmp(input_path, output_path, target_width=1024, target_heig
             row_data = bytearray()
             for x in range(width):
                 r, g, b = img.getpixel((x, y))
-                # RGB565 format
-                rgb565 = ((r >> 3) << 11) | ((g >> 2) << 5) | (b >> 3)
+                # STAX 16-bit PL110 format: (Blue in high 5 bits, Green in mid 6 bits, Red in low 5 bits)
+                rgb565 = ((b >> 3) << 11) | ((g >> 2) << 5) | (r >> 3)
                 row_data += struct.pack('<H', rgb565)
             # Padding
             row_data += b'\x00' * (row_size - len(row_data))

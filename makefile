@@ -197,7 +197,11 @@ all: $(BUILD_DIR) $(BOOT_BIN) $(OS_BIN)
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR) $(BUILD_DIR)/doom_objs
 
-$(OS_BIN): $(KERNEL_BIN) $(BOOT_BIN) $(BUILD_DIR)/hello.elf $(BUILD_DIR)/doom.elf $(BUILD_DIR)/doom.launch tools/stax-sign/stax-sign tools/launch-pack/launch-pack scripts/create_mbr.py
+assets/bmp/BG.BMP: assets/bg.png scripts/convert_bg.py
+	@mkdir -p assets/bmp
+	python3 scripts/convert_bg.py assets/bg.png assets/bmp/BG.BMP
+
+$(OS_BIN): $(KERNEL_BIN) $(BOOT_BIN) $(BUILD_DIR)/hello.elf $(BUILD_DIR)/doom.elf $(BUILD_DIR)/doom.launch tools/stax-sign/stax-sign tools/launch-pack/launch-pack scripts/create_mbr.py assets/bmp/BG.BMP
 	@echo ""
 	@if [ ! -f $@ ]; then \
 		echo "Creating new Flash Image → $@"; \
