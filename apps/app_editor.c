@@ -102,7 +102,7 @@ void editor_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
     
     /* File Name badge */
     const char *doc_name = win->path[0] ? win->path : "Untitled.txt";
-    font_draw_text(cx + 8, cy + 4, doc_name, theme_get_primary_accent(), FONT_STYLE_REGULAR);
+    font_draw_text(cx + 8, cy + 4, doc_name, theme_get_primary_accent(), FONT_STYLE_BOLD);
     
     /* Action Pills */
     int new_x = cx + cw - 150;
@@ -220,8 +220,8 @@ void editor_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
     strcat(status_str, (st->cur_col >= 10) ? cbuf : cbuf + 1);
     strcat(status_str, "  |  UTF-8");
 
-    font_draw_text(cx + 10, sb_y + 2, status_str, rgb565(140, 145, 165), FONT_STYLE_REGULAR);
-    font_draw_text(cx + cw - 110, sb_y + 2, "STAX NanoEdit", theme_get_primary_accent(), FONT_STYLE_REGULAR);
+    font_draw_text(cx + 10, sb_y + 2, status_str, rgb565(140, 145, 165), FONT_STYLE_LIGHT);
+    font_draw_text(cx + cw - 110, sb_y + 2, "STAX NanoEdit", theme_get_primary_accent(), FONT_STYLE_BOLD);
 }
 
 void editor_key_event(struct window *win, char c) {

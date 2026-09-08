@@ -1,27 +1,42 @@
 /* ============================================================================
  * STAX — font.c
- * Authentic Canonical Ubuntu Font Anti-Aliased Alpha Blending Engine
- * (Zero Cutoffs, Fast Parallel Alpha Blending, Robust Clipping)
+ * Authentic StackSans Anti-Aliased Alpha Blending Typography Engine
+ * (Zero Cutoffs, Fast Parallel Alpha Blending, Robust Clipping & Microsecond Speed)
  * ============================================================================ */
 
 #include "font.h"
 #include "framebuffer.h"
-#include "ubuntu_font_data.h"
-#include "font8x16.h"
+#include "stacksans_font_data.h"
 #include "string.h"
 
 void font_init(void) {
-    /* Ready */
+    /* StackSans Engine Ready */
+}
+
+const font_glyph_t *font_get_glyph(char c, font_style_t style) {
+    unsigned char uc = (unsigned char)c;
+    if (uc < 32 || uc >= 127) return NULL;
+    switch (style) {
+        case FONT_STYLE_BOLD:
+            return &stacksans_bold_glyphs[uc];
+        case FONT_STYLE_LIGHT:
+            return &stacksans_light_glyphs[uc];
+        case FONT_STYLE_MONO:
+            return &stacksans_mono_glyphs[uc];
+        case FONT_STYLE_REGULAR:
+        default:
+            return &stacksans_regular_glyphs[uc];
+    }
 }
 
 int font_get_char_width(char c, font_style_t style) {
     unsigned char uc = (unsigned char)c;
     if (uc < 32 || uc >= 127) return 8;
-
     if (style == FONT_STYLE_MONO) {
         return 8;
     }
-    return ubuntu_font_glyphs[uc].advance;
+    const font_glyph_t *g = font_get_glyph(c, style);
+    return g ? g->advance : 8;
 }
 
 int font_get_height(font_style_t style) {
@@ -48,8 +63,9 @@ void font_draw_char_clipped(int x, int y, char c, uint16_t color, font_style_t s
 
     if (y + 16 <= min_y || y >= max_y) return;
 
-    const ubuntu_glyph_t *g = (style == FONT_STYLE_MONO) ? 
-                              &ubuntu_mono_glyphs[uc] : &ubuntu_font_glyphs[uc];
+    const font_glyph_t *g = font_get_glyph(c, style);
+    if (!g) return;
+    
     int gw = g->width;
     int gh = g->height;
     const uint8_t *alpha_ptr = g->alpha;
@@ -95,12 +111,16 @@ int font_draw_text_clipped(int x, int y, const char *str, uint16_t color, font_s
     while (*p) {
         unsigned char c = *p++;
         if (c < 32 || c >= 127) {
-            cur_x += 8;
+            cur_x += (style == FONT_STYLE_MONO) ? 8 : 4;
             continue;
         }
 
-        const ubuntu_glyph_t *g = (style == FONT_STYLE_MONO) ? 
-                                  &ubuntu_mono_glyphs[c] : &ubuntu_font_glyphs[c];
+        const font_glyph_t *g = font_get_glyph(c, style);
+        if (!g) {
+            cur_x += 8;
+            continue;
+        }
+        
         int gw = g->width;
         int gh = g->height;
         const uint8_t *alpha_ptr = g->alpha;
@@ -137,9 +157,4 @@ int font_draw_text_clipped(int x, int y, const char *str, uint16_t color, font_s
 
 int font_draw_text(int x, int y, const char *str, uint16_t color, font_style_t style) {
     return font_draw_text_clipped(x, y, str, color, style, 0, 0, (int)fb_width, (int)fb_height);
-}
-
-int font_load_otf_file(const char *path, int font_size, font_style_t target_slot) {
-    (void)path; (void)font_size; (void)target_slot;
-    return 0;
 }

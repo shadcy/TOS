@@ -82,6 +82,14 @@ void draw_text(int x, int y, const char *s, uint16_t color) {
     font_draw_text(x, y, s, color, FONT_STYLE_REGULAR);
 }
 
+void draw_text_bold(int x, int y, const char *s, uint16_t color) {
+    font_draw_text(x, y, s, color, FONT_STYLE_BOLD);
+}
+
+void draw_text_light(int x, int y, const char *s, uint16_t color) {
+    font_draw_text(x, y, s, color, FONT_STYLE_LIGHT);
+}
+
 void draw_window(window_t *win) {
     if (win->state == WM_STATE_HIDDEN || win->state == WM_STATE_MINIMIZED) return;
     
@@ -167,7 +175,7 @@ void draw_window(window_t *win) {
         title_buf[tl] = win->title[tl];
     }
     title_buf[tl] = '\0';
-    draw_text(tbx + 10, tby + 2, title_buf, is_focused ? theme_sec : rgb565(195, 200, 210));
+    draw_text_bold(tbx + 10, tby + 2, title_buf, is_focused ? theme_sec : rgb565(195, 200, 210));
 
     
     /* Client Area */
@@ -265,7 +273,7 @@ void wm_render(void) {
             }
         }
     } else {
-        draw_text(stax_btn_x + 8, ty + 6, "S", stax_menu_active ? COLOR_WHITE : COLOR_WHITE);
+        draw_text_bold(stax_btn_x + 8, ty + 6, "S", stax_menu_active ? COLOR_WHITE : COLOR_WHITE);
     }
 
     /* 2. Apps Dropdown Button */
@@ -274,7 +282,7 @@ void wm_render(void) {
     uint16_t app_bg = apps_menu_active ? theme_get_primary_accent() : rgb565(38, 42, 54);
     uint16_t app_fg = apps_menu_active ? COLOR_WHITE : rgb565(220, 225, 240);
     fb_fill_rounded_rect(app_btn_x, ty + 3, app_btn_w, 22, 3, app_bg);
-    draw_text(app_btn_x + 10, ty + 6, "Apps", app_fg);
+    draw_text_bold(app_btn_x + 10, ty + 6, "Apps", app_fg);
 
     /* Vertical separator */
     fb_drawline(102, ty + 5, 102, ty + 22, rgb565(48, 52, 65));
@@ -358,52 +366,38 @@ void wm_render(void) {
     char dt_str[32];
     extern void rtc_format_ist_navbar(char *buf, int max_len);
     rtc_format_ist_navbar(dt_str, sizeof(dt_str));
-    int dt_w = font_get_string_width(dt_str, FONT_STYLE_REGULAR) + 12;
+    int dt_w = font_get_string_width(dt_str, FONT_STYLE_LIGHT) + 12;
     int dt_x = fb_width - dt_w - 8;
     fb_fill_rounded_rect(dt_x, ty + 3, dt_w, 22, 3, rgb565(36, 40, 52));
-    draw_text(dt_x + 6, ty + 6, dt_str, COLOR_WHITE);
+    draw_text_light(dt_x + 6, ty + 6, dt_str, COLOR_WHITE);
     
     /* Dynamic Real-Time Memory Usage Pill with Mini Live Chart */
     extern int get_total_memory(void);
     extern int get_free_memory(void);
     uint32_t tot = get_total_memory();
     uint32_t f = get_free_memory();
+    uint32_t used_b = (tot > f) ? (tot - f) : 0;
     uint32_t tot_kb = tot / 1024;
-    uint32_t used_kb = (tot >= f) ? (tot - f) / 1024 : 0;
+    uint32_t used_kb = used_b / 1024;
     
-    char mem_str[24];
-    if (used_kb >= 1024) {
-        uint32_t mb_int = used_kb / 1024;
-        uint32_t mb_dec = ((used_kb % 1024) * 10) / 1024;
-        int mi = 0;
-        if (mb_int >= 10) mem_str[mi++] = '0' + (mb_int / 10);
-        mem_str[mi++] = '0' + (mb_int % 10);
-        mem_str[mi++] = '.';
-        mem_str[mi++] = '0' + mb_dec;
-        mem_str[mi++] = ' ';
-        mem_str[mi++] = 'M';
-        mem_str[mi++] = 'B';
-        mem_str[mi] = '\0';
+    char mem_str[32];
+    int mi = 0;
+    /* Format "RAM: X.X / Y MB" */
+    mem_str[mi++] = 'R'; mem_str[mi++] = 'A'; mem_str[mi++] = 'M'; mem_str[mi++] = ':'; mem_str[mi++] = ' ';
+    uint32_t u_mb_x10 = (used_kb * 10) / 1024;
+    if (u_mb_x10 >= 100) {
+        mem_str[mi++] = '0' + (u_mb_x10 / 100);
+        mem_str[mi++] = '0' + ((u_mb_x10 / 10) % 10);
     } else {
-        int mi = 0;
-        char numbuf[12];
-        int ni = 0;
-        uint32_t temp = used_kb;
-        if (temp == 0) numbuf[ni++] = '0';
-        else {
-            char t2[12]; int ti = 0;
-            while (temp) { t2[ti++] = '0' + (temp % 10); temp /= 10; }
-            while (ti > 0) numbuf[ni++] = t2[--ti];
-        }
-        for (int k = 0; k < ni; k++) mem_str[mi++] = numbuf[k];
-        mem_str[mi++] = ' ';
-        mem_str[mi++] = 'K';
-        mem_str[mi++] = 'B';
-        mem_str[mi] = '\0';
+        mem_str[mi++] = '0' + (u_mb_x10 / 10);
     }
+    mem_str[mi++] = '.';
+    mem_str[mi++] = '0' + (u_mb_x10 % 10);
+    mem_str[mi++] = 'M';
+    mem_str[mi++] = 'B';
+    mem_str[mi++] = '\0';
 
-    /* History sparkline ring buffer */
-    static uint8_t s_mem_history[10] = {14, 15, 14, 16, 17, 16, 18, 17, 19, 18};
+    static uint8_t s_mem_history[10] = {0};
     static uint32_t s_last_sample_tick = 0;
     extern volatile unsigned int tick_count;
     uint32_t cur_ticks = tick_count;
@@ -416,7 +410,7 @@ void wm_render(void) {
     }
 
     int chart_w = 10 * 3; /* 10 bars * (2px width + 1px gap) = 30px */
-    int text_w = font_get_string_width(mem_str, FONT_STYLE_REGULAR);
+    int text_w = font_get_string_width(mem_str, FONT_STYLE_LIGHT);
     int mem_w = chart_w + text_w + 16;
     int mem_x = dt_x - mem_w - 6;
 
@@ -437,7 +431,7 @@ void wm_render(void) {
     }
 
     /* Render live RAM text */
-    draw_text(mem_x + 6 + chart_w + 4, ty + 6, mem_str, COLOR_WHITE);
+    draw_text_light(mem_x + 6 + chart_w + 4, ty + 6, mem_str, COLOR_WHITE);
     
     /* Desktop Context Menu (Clean & Simple) */
     if (ctx_menu.active) {

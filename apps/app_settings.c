@@ -8,7 +8,7 @@
 #include "framebuffer.h"
 #include "string.h"
 #include "heap.h"
-#include "font8x16.h"
+#include "font.h"
 #include "rtc.h"
 #include "fatfs/ff.h"
 #include "system.h"
@@ -151,7 +151,7 @@ void settings_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
     fb_drawline(cx + SIDEBAR_W - 1, cy, cx + SIDEBAR_W - 1, cy + ch - 1, rgb565(205, 210, 220));
 
     /* Sidebar Title */
-    draw_text(cx + 12, cy + 12, "Settings", rgb565(40, 45, 60));
+    draw_text_bold(cx + 12, cy + 12, "Settings", rgb565(40, 45, 60));
     fb_drawline(cx + 10, cy + 32, cx + SIDEBAR_W - 10, cy + 32, rgb565(210, 215, 225));
 
     const char *tabs[] = {"General", "Display", "Date & Time", "Network", "About STAX"};
@@ -161,7 +161,7 @@ void settings_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
         if (is_sel) {
             fb_fillrect(cx + 8, item_y, SIDEBAR_W - 16, 26, theme_get_desktop_bg());
             fb_drawline(cx + 8, item_y, cx + SIDEBAR_W - 9, item_y, theme_get_primary_accent());
-            draw_text(cx + 14, item_y + 5, tabs[t], COLOR_WHITE);
+            draw_text_bold(cx + 14, item_y + 5, tabs[t], COLOR_WHITE);
         } else {
             draw_text(cx + 14, item_y + 5, tabs[t], rgb565(55, 60, 75));
         }
@@ -174,7 +174,7 @@ void settings_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
 
     if (g_settings.active_tab == 0) {
         /* ==== GENERAL & STARTUP SETTINGS ==== */
-        draw_text(px, cy + 12, "Startup & Boot Log Settings", rgb565(25, 30, 45));
+        draw_text_bold(px, cy + 12, "Startup & Boot Log Settings", rgb565(25, 30, 45));
         fb_drawline(px, cy + 30, px + card_w, cy + 30, rgb565(220, 225, 235));
 
         /* Card 1: Boot Log Behavior */
@@ -191,7 +191,7 @@ void settings_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
         /* Card 2: Live Window Control & Reboot */
         draw_card(px, cy + 148, card_w, 72);
         draw_text(px + 14, cy + 158, "Boot Log Window", rgb565(30, 35, 45));
-        draw_text(px + 14, cy + 176, "Live terminal instance", rgb565(120, 125, 140));
+        draw_text_light(px + 14, cy + 176, "Live terminal instance", rgb565(120, 125, 140));
         draw_btn(px + card_w - 240, cy + 160, 110, 26, "Toggle Log", 0);
         draw_danger_btn(px + card_w - 120, cy + 160, 110, 26, "Reboot OS");
 
@@ -199,12 +199,12 @@ void settings_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
         fb_fillrect(px, cy + 230, card_w, 56, rgb565(234, 242, 255));
         fb_drawline(px, cy + 230, px + card_w - 1, cy + 230, rgb565(180, 205, 245));
         fb_drawline(px, cy + 285, px + card_w - 1, cy + 285, rgb565(180, 205, 245));
-        draw_text(px + 12, cy + 238, "* Settings auto-saved to /SETTINGS.CFG on SD", rgb565(0, 120, 30));
-        draw_text(px + 12, cy + 256, "* Boot window anchored below top nav bar (Y=44)", rgb565(30, 75, 150));
+        draw_text_light(px + 12, cy + 238, "* Settings auto-saved to /SETTINGS.CFG on SD", rgb565(0, 120, 30));
+        draw_text_light(px + 12, cy + 256, "* Boot window anchored below top nav bar (Y=44)", rgb565(30, 75, 150));
 
     } else if (g_settings.active_tab == 1) {
         /* ==== DISPLAY & APPEARANCE ==== */
-        draw_text(px, cy + 12, "Display & Desktop Appearance", rgb565(25, 30, 45));
+        draw_text_bold(px, cy + 12, "Display & Desktop Appearance", rgb565(25, 30, 45));
         fb_drawline(px, cy + 30, px + card_w, cy + 30, rgb565(220, 225, 235));
 
         /* Card 1: Theme colors */
@@ -222,64 +222,64 @@ void settings_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
         /* Card 2: Resolution */
         draw_card(px, cy + 144, card_w, 80);
         draw_text(px + 14, cy + 154, "Display Resolution", rgb565(30, 35, 45));
-        draw_text(px + 14, cy + 174, "PL110 16-bit TrueColor", rgb565(120, 125, 140));
+        draw_text_light(px + 14, cy + 174, "PL110 16-bit TrueColor", rgb565(120, 125, 140));
         draw_btn(px + card_w - 195, cy + 158, 90, 24, "800x600", fb_width == 800);
         draw_btn(px + card_w - 95, cy + 158, 90, 24, "1024x768", fb_width == 1024);
 
     } else if (g_settings.active_tab == 2) {
         /* ==== DATE & TIME (IST MUMBAI) ==== */
-        draw_text(px, cy + 12, "Date & Time (IST Mumbai)", rgb565(25, 30, 45));
+        draw_text_bold(px, cy + 12, "Date & Time (IST Mumbai)", rgb565(25, 30, 45));
         fb_drawline(px, cy + 30, px + card_w, cy + 30, rgb565(220, 225, 235));
 
         draw_card(px, cy + 38, card_w, 170);
-        draw_text(px + 14, cy + 48, "Live Time (IST) :", rgb565(30, 35, 45));
+        draw_text_light(px + 14, cy + 48, "Live Time (IST) :", rgb565(30, 35, 45));
         char live_dt[48];
         rtc_format_ist_full(live_dt, sizeof(live_dt));
         draw_text(px + 155, cy + 48, live_dt, rgb565(0, 120, 30));
 
         fb_drawline(px + 14, cy + 72, px + card_w - 14, cy + 72, rgb565(240, 242, 248));
 
-        draw_text(px + 14, cy + 82, "Timezone        :", rgb565(30, 35, 45));
+        draw_text_light(px + 14, cy + 82, "Timezone        :", rgb565(30, 35, 45));
         draw_text(px + 155, cy + 82, "IST (UTC+05:30)", rgb565(40, 45, 60));
 
         fb_drawline(px + 14, cy + 106, px + card_w - 14, cy + 106, rgb565(240, 242, 248));
 
-        draw_text(px + 14, cy + 116, "Hardware RTC    :", rgb565(30, 35, 45));
+        draw_text_light(px + 14, cy + 116, "Hardware RTC    :", rgb565(30, 35, 45));
         draw_text(px + 155, cy + 116, "PL031 (Synced)", rgb565(40, 45, 60));
 
         fb_drawline(px + 14, cy + 140, px + card_w - 14, cy + 140, rgb565(240, 242, 248));
 
-        draw_text(px + 14, cy + 148, "Clock Display   :", rgb565(30, 35, 45));
+        draw_text_light(px + 14, cy + 148, "Clock Display   :", rgb565(30, 35, 45));
         draw_btn(px + card_w - 175, cy + 144, 80, 22, "24-Hour", g_settings.time_format_24h == 1);
         draw_btn(px + card_w - 90, cy + 144, 80, 22, "12-Hour", g_settings.time_format_24h == 0);
     } else if (g_settings.active_tab == 3) {
         /* ==== NETWORK CONFIG & INTERNET CONTROL ==== */
-        draw_text(px, cy + 12, "Internet Connectivity & Network Control", rgb565(25, 30, 45));
+        draw_text_bold(px, cy + 12, "Internet Connectivity & Network Control", rgb565(25, 30, 45));
         fb_drawline(px, cy + 30, px + card_w, cy + 30, rgb565(220, 225, 235));
 
         /* Card 1: Internet Master Switch */
         draw_card(px, cy + 38, card_w, 64);
         draw_text(px + 14, cy + 50, "Internet Connection", rgb565(30, 35, 45));
-        draw_text(px + 14, cy + 68, "Enables TCP/IP, SNTP, DNS & Web browsing", rgb565(120, 125, 140));
+        draw_text_light(px + 14, cy + 68, "Enables TCP/IP, SNTP, DNS & Web browsing", rgb565(120, 125, 140));
         draw_switch(px + card_w - 80, cy + 48, g_settings.network_enabled);
 
         /* Card 2: Live Network Adapter Info */
         draw_card(px, cy + 110, card_w, 130);
         int is_on = g_settings.network_enabled;
         
-        draw_text(px + 14, cy + 120, "Status   :", rgb565(30, 35, 45));
-        draw_text(px + 105, cy + 120, is_on ? "ONLINE / CONNECTED" : "OFFLINE / DISABLED", is_on ? rgb565(0, 140, 40) : rgb565(210, 40, 40));
+        draw_text_light(px + 14, cy + 120, "Status   :", rgb565(30, 35, 45));
+        draw_text_bold(px + 105, cy + 120, is_on ? "ONLINE / CONNECTED" : "OFFLINE / DISABLED", is_on ? rgb565(0, 140, 40) : rgb565(210, 40, 40));
 
-        draw_text(px + 14, cy + 140, "IP Addr  :", rgb565(30, 35, 45));
+        draw_text_light(px + 14, cy + 140, "IP Addr  :", rgb565(30, 35, 45));
         draw_text(px + 105, cy + 140, is_on ? "10.0.2.15 (DHCP Active)" : "--.--.--.--", rgb565(40, 50, 70));
 
-        draw_text(px + 14, cy + 160, "Gateway  :", rgb565(30, 35, 45));
+        draw_text_light(px + 14, cy + 160, "Gateway  :", rgb565(30, 35, 45));
         draw_text(px + 105, cy + 160, is_on ? "10.0.2.2 (QEMU Slirp)" : "--.--.--.--", rgb565(40, 50, 70));
 
-        draw_text(px + 14, cy + 180, "DNS / RTT:", rgb565(30, 35, 45));
+        draw_text_light(px + 14, cy + 180, "DNS / RTT:", rgb565(30, 35, 45));
         draw_text(px + 105, cy + 180, is_on ? "10.0.2.3 | 12ms (Nominal)" : "Offline", rgb565(40, 50, 70));
 
-        draw_text(px + 14, cy + 200, "Adapter  :", rgb565(30, 35, 45));
+        draw_text_light(px + 14, cy + 200, "Adapter  :", rgb565(30, 35, 45));
         draw_text(px + 105, cy + 200, "SMC91C111 100Mbps Ethernet", rgb565(40, 50, 70));
 
         /* Action Buttons */
@@ -287,16 +287,14 @@ void settings_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
 
     } else if (g_settings.active_tab == 4) {
         /* ==== ABOUT STAX OS ==== */
-        draw_text(px, cy + 12, "About STAX Operating System", rgb565(25, 30, 45));
+        draw_text_bold(px, cy + 12, "About STAX Operating System", rgb565(25, 30, 45));
         fb_drawline(px, cy + 30, px + card_w, cy + 30, rgb565(220, 225, 235));
 
         draw_card(px, cy + 38, card_w, 150);
-        draw_text(px + 14, cy + 48, "STAX Operating System", rgb565(20, 40, 110));
+        draw_text_bold(px + 14, cy + 48, "STAX Operating System", rgb565(20, 40, 110));
         draw_text(px + 14, cy + 70, "Edition    : Advanced Agentic Edition", rgb565(50, 55, 70));
         draw_text(px + 14, cy + 92, "Kernel     : ARM926EJ-S Monolithic Phase 6e", rgb565(50, 55, 70));
         draw_text(px + 14, cy + 114, "Compositor : Multi-Window GFX Compositor", rgb565(50, 55, 70));
-        draw_text(px + 14, cy + 136, "Status     : All Subsystems Nominal", rgb565(0, 110, 25));
-
         draw_danger_btn(px, cy + 196, 140, 28, "Reboot System");
     }
 }

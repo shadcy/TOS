@@ -5,7 +5,7 @@
 
 #include "gfx_console.h"
 #include "framebuffer.h"
-#include "font8x16.h"
+#include "font.h"
 #include "wm.h"
 
 #define COLS   80
@@ -159,14 +159,19 @@ void gfx_console_draw_window(struct window *win, int cx, int cy, int cw, int ch)
     fb_fillrect(cx, cy, cw, ch, rgb565(14, 16, 22));
 
     /* Top Info Bar */
-    int top_bar_h = 20;
-    fb_fillrect(cx, cy, cw, top_bar_h, rgb565(22, 25, 34));
-    fb_drawline(cx, cy + top_bar_h - 1, cx + cw - 1, cy + top_bar_h - 1, rgb565(38, 44, 60));
-    draw_text(cx + 8, cy + 2, "[STAX] Kernel Boot Log", theme_get_primary_accent());
-    draw_text(cx + cw - 90, cy + 2, "Live Stream", rgb565(120, 135, 160));
+    int top_bar_h = 24;
+    fb_fillrect(cx, cy, cw, top_bar_h, rgb565(20, 23, 32));
+    fb_drawline(cx, cy + top_bar_h - 1, cx + cw - 1, cy + top_bar_h - 1, rgb565(36, 42, 58));
+    
+    fb_fill_rounded_rect(cx + 10, cy + 8, 8, 8, 4, rgb565(40, 210, 110));
+    font_draw_text(cx + 24, cy + 4, "STAX Kernel Boot Log", theme_get_primary_accent(), FONT_STYLE_BOLD);
+    
+    int badge_x = cx + cw - 95;
+    fb_fill_rounded_rect(badge_x, cy + 4, 85, 16, 3, rgb565(30, 35, 48));
+    font_draw_text(badge_x + 6, cy + 4, "Live Stream", rgb565(140, 150, 175), FONT_STYLE_LIGHT);
 
     int text_area_h = ch - top_bar_h - 4;
-    int max_cols = (cw - 20) / 8;
+    int max_cols = (cw - 24) / 8;
     int max_rows = text_area_h / 16;
     if (max_cols > COLS) max_cols = COLS;
     if (max_rows > ROWS) max_rows = ROWS;
@@ -191,23 +196,17 @@ void gfx_console_draw_window(struct window *win, int cx, int cy, int cw, int ch)
         int buf_line = start_line + r;
         if (buf_line < 0 || buf_line > head_line) continue;
         
-        for (int c = 0; c < max_cols; c++) {
+        int px = cx + 10;
+        int py = cy + top_bar_h + 4 + r * 16;
+        for (int c = 0; c < COLS; c++) {
             char ch_val = term_text[buf_line % MAX_LINES][c];
-            if (ch_val >= 32) {
+            if (!ch_val) break;
+            if (ch_val >= 32 && ch_val <= 126) {
                 uint16_t color = term_color[buf_line % MAX_LINES][c];
-                const unsigned char *g = font8x16_data[(unsigned char)ch_val];
-                int px = cx + 8 + c * 8;
-                int py = cy + top_bar_h + 4 + r * 16;
-                for (int gr = 0; gr < 16; gr++) {
-                    unsigned char bits = g[gr];
-                    for (int gb = 0; gb < 8; gb++) {
-                        if (bits & (0x80 >> gb)) {
-                            if (py+gr >= 0 && py+gr < (int)fb_height && px+gb >= 0 && px+gb < (int)fb_width) {
-                                fbuf[(py+gr)*fb_width + (px+gb)] = color;
-                            }
-                        }
-                    }
-                }
+                int ch_w = font_get_char_width(ch_val, FONT_STYLE_REGULAR);
+                if (px + ch_w > cx + cw - 16) break;
+                font_draw_char_clipped(px, py, ch_val, color, FONT_STYLE_REGULAR, cx + 8, cy + top_bar_h, cx + cw - 16, cy + ch);
+                px += ch_w;
             }
         }
     }

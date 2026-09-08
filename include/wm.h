@@ -56,6 +56,8 @@ void wm_focus_shell(void);
 void wm_render(void);
 void wm_update(void); /* handles input */
 void draw_text(int x, int y, const char *s, uint16_t color);
+void draw_text_bold(int x, int y, const char *s, uint16_t color);
+void draw_text_light(int x, int y, const char *s, uint16_t color);
 
 /* Dynamic Theme Color Accessors (updates in real-time when theme is changed in Settings) */
 uint16_t theme_get_primary_accent(void);

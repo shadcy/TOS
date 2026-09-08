@@ -102,12 +102,12 @@ void memview_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
     /* Tab 0: Telemetry */
     uint16_t tab0_bg = (st->tab_mode == 0) ? theme_get_primary_accent() : rgb565(44, 48, 62);
     fb_fill_rounded_rect(cx + 8, cy + 5, 120, 22, 3, tab0_bg);
-    font_draw_text(cx + 18, cy + 8, "Telemetry & Chart", COLOR_WHITE, FONT_STYLE_REGULAR);
+    font_draw_text(cx + 18, cy + 8, "Telemetry & Chart", COLOR_WHITE, (st->tab_mode == 0) ? FONT_STYLE_BOLD : FONT_STYLE_REGULAR);
 
     /* Tab 1: Hex Inspector */
     uint16_t tab1_bg = (st->tab_mode == 1) ? theme_get_primary_accent() : rgb565(44, 48, 62);
     fb_fill_rounded_rect(cx + 134, cy + 5, 105, 22, 3, tab1_bg);
-    font_draw_text(cx + 144, cy + 8, "Hex Inspector", COLOR_WHITE, FONT_STYLE_REGULAR);
+    font_draw_text(cx + 144, cy + 8, "Hex Inspector", COLOR_WHITE, (st->tab_mode == 1) ? FONT_STYLE_BOLD : FONT_STYLE_REGULAR);
 
     if (st->tab_mode == 0) {
         /* ================= 1. LIVE TELEMETRY & CHART ================= */
@@ -125,27 +125,27 @@ void memview_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
 
         /* Card 1: Used Memory */
         fb_fill_rounded_rect(cx + 8, card_y, card_w, 52, 4, rgb565(36, 40, 54));
-        font_draw_text(cx + 16, card_y + 6, "USED MEMORY", rgb565(140, 145, 165), FONT_STYLE_REGULAR);
+        font_draw_text(cx + 16, card_y + 6, "USED MEMORY", rgb565(140, 145, 165), FONT_STYLE_LIGHT);
         char used_str[32]; format_kb(used_kb, used_str);
-        font_draw_text(cx + 16, card_y + 26, used_str, rgb565(240, 110, 50), FONT_STYLE_REGULAR);
+        font_draw_text(cx + 16, card_y + 26, used_str, rgb565(240, 110, 50), FONT_STYLE_BOLD);
 
         /* Card 2: Free Memory */
         int c2_x = cx + 8 + card_w + 8;
         fb_fill_rounded_rect(c2_x, card_y, card_w, 52, 4, rgb565(36, 40, 54));
-        font_draw_text(c2_x + 8, card_y + 6, "FREE MEMORY", rgb565(140, 145, 165), FONT_STYLE_REGULAR);
+        font_draw_text(c2_x + 8, card_y + 6, "FREE MEMORY", rgb565(140, 145, 165), FONT_STYLE_LIGHT);
         char free_str[32]; format_kb(free_kb, free_str);
-        font_draw_text(c2_x + 8, card_y + 26, free_str, rgb565(40, 180, 100), FONT_STYLE_REGULAR);
+        font_draw_text(c2_x + 8, card_y + 26, free_str, rgb565(40, 180, 100), FONT_STYLE_BOLD);
 
         /* Card 3: Total RAM */
         int c3_x = c2_x + card_w + 8;
         fb_fill_rounded_rect(c3_x, card_y, card_w, 52, 4, rgb565(36, 40, 54));
-        font_draw_text(c3_x + 8, card_y + 6, "TOTAL POOL", rgb565(140, 145, 165), FONT_STYLE_REGULAR);
+        font_draw_text(c3_x + 8, card_y + 6, "TOTAL POOL", rgb565(140, 145, 165), FONT_STYLE_LIGHT);
         char tot_str[32]; format_kb(tot_kb, tot_str);
-        font_draw_text(c3_x + 8, card_y + 26, tot_str, COLOR_WHITE, FONT_STYLE_REGULAR);
+        font_draw_text(c3_x + 8, card_y + 26, tot_str, COLOR_WHITE, FONT_STYLE_BOLD);
 
         /* Segmented Visual RAM Map Bar */
         int map_y = card_y + 62;
-        font_draw_text(cx + 10, map_y, "Physical Memory Allocation Map", rgb565(200, 205, 225), FONT_STYLE_REGULAR);
+        font_draw_text(cx + 10, map_y, "Physical Memory Allocation Map", rgb565(200, 205, 225), FONT_STYLE_BOLD);
         
         int bar_x = cx + 10;
         int bar_y = map_y + 18;
@@ -160,7 +160,8 @@ void memview_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
 
         /* Real-Time Waveform Activity Graph */
         int graph_y = bar_y + 28;
-        font_draw_text(cx + 10, graph_y, "Real-Time Memory Waveform (Live 500ms Tick)", rgb565(200, 205, 225), FONT_STYLE_REGULAR);
+        font_draw_text(cx + 10, graph_y, "Real-Time Memory Waveform", rgb565(200, 205, 225), FONT_STYLE_BOLD);
+        font_draw_text(cx + 210, graph_y, "(Live 500ms Tick)", rgb565(140, 145, 165), FONT_STYLE_LIGHT);
 
         int gx = cx + 10;
         int gy = graph_y + 18;

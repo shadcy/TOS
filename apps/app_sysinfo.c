@@ -44,34 +44,34 @@ void sysinfo_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
     /* Header Card */
     if (ch >= 60) {
         fb_fill_rounded_rect(cx + 8, cy + 8, 48, 48, 6, theme_get_primary_accent());
-        draw_text(cx + 14, cy + 24, "STAX", COLOR_WHITE);
+        draw_text_bold(cx + 14, cy + 24, "STAX", COLOR_WHITE);
         
-        draw_text(cx + 66, cy + 12, "STAX OS (v2.0)", rgb565(20, 24, 32));
-        draw_text(cx + 66, cy + 32, "GPOS Architecture Edition", rgb565(110, 115, 130));
+        draw_text_bold(cx + 66, cy + 12, "STAX OS (v2.0)", rgb565(20, 24, 32));
+        draw_text_light(cx + 66, cy + 32, "GPOS Architecture Edition", rgb565(110, 115, 130));
     }
     
     if (ch >= 130) {
         fb_drawline(cx + 8, cy + 64, cx + cw - 8, cy + 64, rgb565(215, 218, 228));
         
         /* Stats */
-        draw_text(cx + 10, cy + 72, "System Uptime:", rgb565(90, 95, 110));
+        draw_text_light(cx + 10, cy + 72, "System Uptime:", rgb565(90, 95, 110));
         char buf[32];
         int_to_str(tick_count / 1000, buf);
         int len = strlen(buf);
         buf[len] = ' '; buf[len+1] = 's'; buf[len+2] = '\0';
         draw_text(cx + 130, cy + 72, buf, rgb565(20, 24, 32));
         
-        draw_text(cx + 10, cy + 90, "Architecture:", rgb565(90, 95, 110));
+        draw_text_light(cx + 10, cy + 90, "Architecture:", rgb565(90, 95, 110));
         draw_text(cx + 130, cy + 90, "ARM926EJ-S", rgb565(20, 24, 32));
         
-        draw_text(cx + 10, cy + 108, "Display Mode:", rgb565(90, 95, 110));
+        draw_text_light(cx + 10, cy + 108, "Display Mode:", rgb565(90, 95, 110));
         draw_text(cx + 130, cy + 108, "1024x768 16-bit RGB", rgb565(20, 24, 32));
     }
     
     /* Memory Usage Section & Progress Bar */
     if (ch >= 180) {
         fb_drawline(cx + 8, cy + 130, cx + cw - 8, cy + 130, rgb565(215, 218, 228));
-        draw_text(cx + 10, cy + 136, "Memory Allocation", rgb565(20, 24, 32));
+        draw_text_bold(cx + 10, cy + 136, "Memory Allocation", rgb565(20, 24, 32));
         
         uint32_t total = heap_get_total();
         uint32_t free_mem = heap_get_free();
@@ -86,10 +86,10 @@ void sysinfo_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
         len = strlen(fbuf);
         fbuf[len] = ' '; fbuf[len+1] = 'K'; fbuf[len+2] = 'B'; fbuf[len+3] = '\0';
         
-        draw_text(cx + 10, cy + 154, "Used:", rgb565(90, 95, 110));
+        draw_text_light(cx + 10, cy + 154, "Used:", rgb565(90, 95, 110));
         draw_text(cx + 56, cy + 154, ubuf, rgb565(20, 24, 32));
         
-        draw_text(cx + 140, cy + 154, "Free:", rgb565(90, 95, 110));
+        draw_text_light(cx + 140, cy + 154, "Free:", rgb565(90, 95, 110));
         draw_text(cx + 186, cy + 154, fbuf, rgb565(20, 24, 32));
         
         /* Progress Bar (Strictly clamped to window boundary) */

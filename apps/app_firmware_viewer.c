@@ -1,7 +1,7 @@
 #include "wm.h"
 #include "framebuffer.h"
 #include "string.h"
-#include "font8x16.h"
+#include "font.h"
 #include "fatfs/ff.h"
 #include "../firmware/image_format/firmware_format.h"
 
@@ -17,14 +17,14 @@ void fwviewer_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
     /* Header */
     fb_fillrect(cx + 10, cy + 10, 64, 64, theme_get_desktop_bg());
     fb_drawline(cx + 10, cy + 10, cx + 73, cy + 10, theme_get_primary_accent());
-    draw_text(cx + 20, cy + 34, "FW", theme_get_primary_accent());
+    draw_text_bold(cx + 20, cy + 34, "FW", theme_get_primary_accent());
     
-    draw_text(cx + 90, cy + 20, "STAX Firmware Package", COLOR_BLACK);
+    draw_text_bold(cx + 90, cy + 20, "STAX Firmware Package", COLOR_BLACK);
     
     fb_drawline(cx + 10, cy + 85, cx + cw - 10, cy + 85, rgb565(180, 180, 180));
     
     if (win->path[0] != '\0') {
-        draw_text(cx + 10, cy + 100, "File:", COLOR_BLACK);
+        draw_text_light(cx + 10, cy + 100, "File:", COLOR_BLACK);
         draw_text(cx + 100, cy + 100, win->path, COLOR_BLACK);
         
         if (!win->app_data) {
@@ -48,7 +48,7 @@ void fwviewer_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
         if (win->app_data && win->app_data != (void*)1) {
             firmware_header_t *hdr = (firmware_header_t *)win->app_data;
             
-            draw_text(cx + 10, cy + 130, "Version:", COLOR_BLACK);
+            draw_text_light(cx + 10, cy + 130, "Version:", COLOR_BLACK);
             char buf[32];
             int val = hdr->image_ver;
             int i = 0;
@@ -59,9 +59,9 @@ void fwviewer_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
                 while (ti > 0) buf[i++] = temp[--ti];
             }
             buf[i] = '\0';
-            draw_text(cx + 100, cy + 130, buf, theme_get_primary_accent());
+            draw_text_bold(cx + 100, cy + 130, buf, theme_get_primary_accent());
             
-            draw_text(cx + 10, cy + 150, "Size:", COLOR_BLACK);
+            draw_text_light(cx + 10, cy + 150, "Size:", COLOR_BLACK);
             val = hdr->image_size;
             i = 0;
             if (val == 0) { buf[i++] = '0'; }
@@ -73,12 +73,12 @@ void fwviewer_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
             buf[i++] = ' '; buf[i++] = 'B'; buf[i] = '\0';
             draw_text(cx + 100, cy + 150, buf, COLOR_BLACK);
             
-            draw_text(cx + 10, cy + 170, "Signature:", COLOR_BLACK);
-            draw_text(cx + 100, cy + 170, "Ed25519 (Signed)", theme_get_primary_accent());
+            draw_text_light(cx + 10, cy + 170, "Signature:", COLOR_BLACK);
+            draw_text_bold(cx + 100, cy + 170, "Ed25519 (Signed)", theme_get_primary_accent());
             
-            draw_text(cx + 10, cy + 200, "This file contains a secure STAX", COLOR_BLACK);
-            draw_text(cx + 10, cy + 215, "firmware update payload.", COLOR_BLACK);
-            draw_text(cx + 10, cy + 240, "Run 'fwupdate' in terminal to install.", COLOR_BLACK);
+            draw_text_light(cx + 10, cy + 200, "This file contains a secure STAX", rgb565(60, 60, 60));
+            draw_text_light(cx + 10, cy + 215, "firmware update payload.", rgb565(60, 60, 60));
+            draw_text_light(cx + 10, cy + 240, "Run 'fwupdate' in terminal to install.", rgb565(80, 80, 80));
         } else {
             draw_text(cx + 10, cy + 130, "Status: Invalid or corrupted STAX file.", rgb565(200, 0, 0));
         }

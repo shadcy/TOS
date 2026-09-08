@@ -1,7 +1,7 @@
 #include "wm.h"
 #include "framebuffer.h"
 #include "bmp.h"
-#include "font8x16.h"
+#include "font.h"
 
 void image_viewer_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
     (void)cw;

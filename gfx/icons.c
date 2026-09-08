@@ -281,8 +281,8 @@ void icon_draw_desktop_file(int ix, int iy, const char *filename, int is_dir) {
                 badge = "ELF";
             }
         }
-        int tw = font_get_string_width(badge, FONT_STYLE_REGULAR);
-        font_draw_text(x + 32 - tw, y + 22, badge, pri, FONT_STYLE_REGULAR);
+        int tw = font_get_string_width(badge, FONT_STYLE_BOLD);
+        font_draw_text(x + 32 - tw, y + 22, badge, pri, FONT_STYLE_BOLD);
         break;
     }
 
@@ -297,8 +297,8 @@ void icon_draw_desktop_file(int ix, int iy, const char *filename, int is_dir) {
         fb_fillrect(x + 9, y + 12, 6, 4, rgb565(255, 195, 60));
 
         /* Badge text on bottom-right */
-        int tw = font_get_string_width(".STX", FONT_STYLE_REGULAR);
-        font_draw_text(x + 32 - tw, y + 22, ".STX", rgb565(255, 130, 80), FONT_STYLE_REGULAR);
+        int tw = font_get_string_width(".STX", FONT_STYLE_BOLD);
+        font_draw_text(x + 32 - tw, y + 22, ".STX", rgb565(255, 130, 80), FONT_STYLE_BOLD);
         break;
     }
 
@@ -313,8 +313,8 @@ void icon_draw_desktop_file(int ix, int iy, const char *filename, int is_dir) {
         fb_draw_hline(x + 8, y + 13, 8, COLOR_WHITE);
 
         /* Badge text on bottom-right */
-        int tw = font_get_string_width("APP", FONT_STYLE_REGULAR);
-        font_draw_text(x + 32 - tw, y + 22, "APP", sec, FONT_STYLE_REGULAR);
+        int tw = font_get_string_width("APP", FONT_STYLE_BOLD);
+        font_draw_text(x + 32 - tw, y + 22, "APP", sec, FONT_STYLE_BOLD);
         break;
     }
 
@@ -329,8 +329,8 @@ void icon_draw_desktop_file(int ix, int iy, const char *filename, int is_dir) {
         fb_fill_rounded_rect(x + 6, y + 14, 14, 8, 2, rgb565(40, 150, 90));
 
         /* Badge text on bottom-right */
-        int tw = font_get_string_width("BMP", FONT_STYLE_REGULAR);
-        font_draw_text(x + 32 - tw, y + 22, "BMP", rgb565(40, 140, 85), FONT_STYLE_REGULAR);
+        int tw = font_get_string_width("BMP", FONT_STYLE_BOLD);
+        font_draw_text(x + 32 - tw, y + 22, "BMP", rgb565(40, 140, 85), FONT_STYLE_BOLD);
         break;
     }
 
@@ -368,25 +368,25 @@ void icon_draw_file_mini(int x, int y, const char *filename, int is_dir) {
     case ICON_FILE_EXEC:
         fb_fill_rounded_rect(x + 1, y + 1, 14, 14, 2, rgb565(36, 38, 48));
         fb_draw_hline(x + 2, y + 1, 12, pri);
-        font_draw_text(x + 3, y + 2, "B", pri, FONT_STYLE_REGULAR);
+        font_draw_text(x + 3, y + 2, "B", pri, FONT_STYLE_BOLD);
         break;
 
     case ICON_FILE_FIRMWARE:
         fb_fill_rounded_rect(x + 1, y + 1, 14, 14, 2, rgb565(45, 36, 50));
         fb_draw_hline(x + 2, y + 1, 12, rgb565(240, 110, 60));
-        font_draw_text(x + 3, y + 2, "S", rgb565(255, 130, 80), FONT_STYLE_REGULAR);
+        font_draw_text(x + 3, y + 2, "S", rgb565(255, 130, 80), FONT_STYLE_BOLD);
         break;
 
     case ICON_FILE_PACKAGE:
         fb_fill_rounded_rect(x + 1, y + 1, 14, 14, 2, rgb565(34, 45, 46));
         fb_draw_hline(x + 2, y + 1, 12, theme_get_secondary_accent());
-        font_draw_text(x + 3, y + 2, "A", theme_get_secondary_accent(), FONT_STYLE_REGULAR);
+        font_draw_text(x + 3, y + 2, "A", theme_get_secondary_accent(), FONT_STYLE_BOLD);
         break;
 
     case ICON_FILE_IMAGE:
         fb_fill_rounded_rect(x + 1, y + 1, 14, 14, 2, rgb565(248, 250, 254));
         fb_draw_hline(x + 2, y + 1, 12, rgb565(40, 160, 95));
-        font_draw_text(x + 3, y + 2, "I", rgb565(40, 140, 85), FONT_STYLE_REGULAR);
+        font_draw_text(x + 3, y + 2, "I", rgb565(40, 140, 85), FONT_STYLE_BOLD);
         break;
 
     default:

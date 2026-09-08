@@ -1,5 +1,5 @@
 #include "wm.h"
-#include "font8x16.h"
+#include "font.h"
 #include "console.h"
 #include "string.h"
 #include "keyboard.h"

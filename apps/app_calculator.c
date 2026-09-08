@@ -191,22 +191,22 @@ void calculator_draw_window(struct window *win, int cx, int cy, int cw, int ch) 
 
     /* Memory indicator */
     if (st->has_memory) {
-        font_draw_text(disp_x + 8, disp_y + 4, "M", rgb565(80, 240, 120), FONT_STYLE_REGULAR);
+        font_draw_text(disp_x + 8, disp_y + 4, "M", rgb565(80, 240, 120), FONT_STYLE_BOLD);
     }
 
     /* Sub expression (upper formula) */
     if (st->sub_buf[0]) {
-        int sub_w = font_get_string_width(st->sub_buf, FONT_STYLE_REGULAR);
-        font_draw_text(disp_x + disp_w - 10 - sub_w, disp_y + 4, st->sub_buf, rgb565(130, 140, 160), FONT_STYLE_REGULAR);
+        int sub_w = font_get_string_width(st->sub_buf, FONT_STYLE_LIGHT);
+        font_draw_text(disp_x + disp_w - 10 - sub_w, disp_y + 4, st->sub_buf, rgb565(130, 140, 160), FONT_STYLE_LIGHT);
     }
 
     /* Main digits */
-    int main_w = font_get_string_width(st->display_buf, FONT_STYLE_REGULAR);
+    int main_w = font_get_string_width(st->display_buf, FONT_STYLE_BOLD);
     int main_x = disp_x + disp_w - 10 - main_w;
     if (main_x < disp_x + 8) main_x = disp_x + 8;
     font_draw_text_clipped(main_x, disp_y + 24, st->display_buf, 
                            st->has_error ? rgb565(255, 80, 80) : COLOR_WHITE, 
-                           FONT_STYLE_REGULAR, disp_x + 6, disp_y + 20, disp_x + disp_w - 6, disp_y + disp_h);
+                           FONT_STYLE_BOLD, disp_x + 6, disp_y + 20, disp_x + disp_w - 6, disp_y + disp_h);
 
     /* 5 Columns x 6 Rows Keypad */
     const char *btn_labels[6][5] = {
@@ -258,10 +258,10 @@ void calculator_draw_window(struct window *win, int cx, int cy, int cw, int ch) 
             fb_fill_rounded_rect(bx, by, bw, btn_h, 4, bg);
             fb_drawline(bx + 2, by, bx + bw - 3, by, rgb565(80, 85, 105));
 
-            int tw = font_get_string_width(label, FONT_STYLE_REGULAR);
+            int tw = font_get_string_width(label, FONT_STYLE_BOLD);
             int tx = bx + (bw - tw) / 2;
             int ty = by + (btn_h - 16) / 2;
-            font_draw_text(tx, ty, label, fg, FONT_STYLE_REGULAR);
+            font_draw_text(tx, ty, label, fg, FONT_STYLE_BOLD);
         }
     }
 }

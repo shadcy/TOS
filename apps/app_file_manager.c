@@ -322,7 +322,7 @@ void file_manager_draw_window(struct window *win, int cx, int cy, int cw, int ch
     fb_fillrect(cx, cy + ADDR_H, SIDEBAR_W, ch - ADDR_H, rgb565(34, 36, 46));
     fb_drawline(cx + SIDEBAR_W - 1, cy + ADDR_H, cx + SIDEBAR_W - 1, cy + ch - 1, rgb565(52, 56, 70));
 
-    font_draw_text(cx + 12, cy + ADDR_H + 6, "PLACES", rgb565(120, 125, 145), FONT_STYLE_REGULAR);
+    font_draw_text(cx + 12, cy + ADDR_H + 6, "PLACES", rgb565(140, 145, 165), FONT_STYLE_BOLD);
 
     const char *places_labels[5] = {"Home", "Documents", "Downloads", "Binaries", "Trash"};
     const char *places_paths[5]  = {"", "DOCS", "DOWNLOADS", "BIN", "TRASH"};
@@ -335,14 +335,14 @@ void file_manager_draw_window(struct window *win, int cx, int cy, int cw, int ch
         }
 
         uint16_t text_col = is_active ? COLOR_WHITE : rgb565(210, 215, 230);
-        font_draw_text(cx + 14, sy + 1, places_labels[p], text_col, FONT_STYLE_REGULAR);
+        font_draw_text(cx + 14, sy + 1, places_labels[p], text_col, is_active ? FONT_STYLE_BOLD : FONT_STYLE_REGULAR);
 
         if (p == 4 && st->trash_count > 0) {
             /* Trash item counter pill */
             char tcnt[8]; num_to_str(st->trash_count, tcnt);
             int badge_x = cx + SIDEBAR_W - 24;
             fb_fill_rounded_rect(badge_x, sy, 16, 14, 2, rgb565(220, 60, 60));
-            font_draw_text(badge_x + 4, sy - 1, tcnt, COLOR_WHITE, FONT_STYLE_REGULAR);
+            font_draw_text(badge_x + 4, sy - 1, tcnt, COLOR_WHITE, FONT_STYLE_BOLD);
         }
 
         sy += 24;
@@ -352,7 +352,7 @@ void file_manager_draw_window(struct window *win, int cx, int cy, int cw, int ch
     sy += 8;
     fb_drawline(cx + 6, sy, cx + SIDEBAR_W - 6, sy, rgb565(48, 52, 65));
     sy += 6;
-    font_draw_text(cx + 12, sy, "DEVICES", rgb565(120, 125, 145), FONT_STYLE_REGULAR);
+    font_draw_text(cx + 12, sy, "DEVICES", rgb565(140, 145, 165), FONT_STYLE_BOLD);
     sy += 18;
     font_draw_text(cx + 14, sy, "SD Card", rgb565(210, 215, 230), FONT_STYLE_REGULAR);
 
@@ -368,9 +368,9 @@ void file_manager_draw_window(struct window *win, int cx, int cy, int cw, int ch
     fb_fillrect(main_x, hy, main_w, 20, rgb565(232, 235, 242));
     fb_drawline(main_x, hy + 19, main_x + main_w - 1, hy + 19, rgb565(205, 210, 222));
 
-    font_draw_text(main_x + 26, hy + 2, "File Name", rgb565(90, 95, 110), FONT_STYLE_REGULAR);
-    font_draw_text(col_type_x, hy + 2, "Type", rgb565(90, 95, 110), FONT_STYLE_REGULAR);
-    font_draw_text(col_size_x, hy + 2, "Size", rgb565(90, 95, 110), FONT_STYLE_REGULAR);
+    font_draw_text(main_x + 26, hy + 2, "File Name", rgb565(70, 75, 90), FONT_STYLE_BOLD);
+    font_draw_text(col_type_x, hy + 2, "Type", rgb565(70, 75, 90), FONT_STYLE_BOLD);
+    font_draw_text(col_size_x, hy + 2, "Size", rgb565(70, 75, 90), FONT_STYLE_BOLD);
 
     /* ---- 4. File Rows ---- */
     int item_y = cy + HDR_H;
@@ -403,20 +403,20 @@ void file_manager_draw_window(struct window *win, int cx, int cy, int cw, int ch
 
         if (st->file_list[i].is_dir) {
             uint16_t fcol = (i == st->selected_idx) ? sub_col : theme_get_primary_accent();
-            font_draw_text(col_type_x, item_y + 3, "Folder", fcol, FONT_STYLE_REGULAR);
+            font_draw_text(col_type_x, item_y + 3, "Folder", fcol, FONT_STYLE_LIGHT);
         } else if (is_txt(st->file_list[i].name)) {
-            font_draw_text(col_type_x, item_y + 3, "Text Doc", sub_col, FONT_STYLE_REGULAR);
+            font_draw_text(col_type_x, item_y + 3, "Text Doc", sub_col, FONT_STYLE_LIGHT);
         } else if (is_stax(st->file_list[i].name)) {
-            font_draw_text(col_type_x, item_y + 3, "Firmware", sub_col, FONT_STYLE_REGULAR);
+            font_draw_text(col_type_x, item_y + 3, "Firmware", sub_col, FONT_STYLE_LIGHT);
         } else {
-            font_draw_text(col_type_x, item_y + 3, "Binary", sub_col, FONT_STYLE_REGULAR);
+            font_draw_text(col_type_x, item_y + 3, "Binary", sub_col, FONT_STYLE_LIGHT);
         }
 
         if (!st->file_list[i].is_dir) {
             char sz[24]; num_to_str(st->file_list[i].size, sz);
             int l=0; while(sz[l]) l++;
             sz[l]=' '; sz[l+1]='B'; sz[l+2]='\0';
-            font_draw_text(col_size_x, item_y + 3, sz, sub_col, FONT_STYLE_REGULAR);
+            font_draw_text(col_size_x, item_y + 3, sz, sub_col, FONT_STYLE_LIGHT);
         }
 
         if (i != st->selected_idx) {
@@ -427,7 +427,7 @@ void file_manager_draw_window(struct window *win, int cx, int cy, int cw, int ch
 
     if (st->file_count == 0) {
         const char *msg = in_trash ? "Trash is empty" : "Folder is empty";
-        font_draw_text(main_x + main_w/2 - 45, cy + ch/2 - 8, msg, rgb565(150, 155, 170), FONT_STYLE_REGULAR);
+        font_draw_text(main_x + main_w/2 - 45, cy + ch/2 - 8, msg, rgb565(150, 155, 170), FONT_STYLE_LIGHT);
     }
 
     /* ---- 5. Bottom Status Bar ---- */
@@ -439,8 +439,8 @@ void file_manager_draw_window(struct window *win, int cx, int cy, int cw, int ch
     num_to_str(st->file_count, cnt_str);
     int clen = strlen(cnt_str);
     cnt_str[clen] = ' '; cnt_str[clen+1] = 'i'; cnt_str[clen+2] = 't'; cnt_str[clen+3] = 'e'; cnt_str[clen+4] = 'm'; cnt_str[clen+5] = 's'; cnt_str[clen+6] = '\0';
-    font_draw_text(main_x + 8, sb_y + 2, cnt_str, rgb565(80, 85, 100), FONT_STYLE_REGULAR);
-    font_draw_text(main_x + main_w - 120, sb_y + 2, "FAT16 SD Storage", rgb565(100, 105, 120), FONT_STYLE_REGULAR);
+    font_draw_text(main_x + 8, sb_y + 2, cnt_str, rgb565(80, 85, 100), FONT_STYLE_LIGHT);
+    font_draw_text(main_x + main_w - 120, sb_y + 2, "FAT16 SD Storage", rgb565(100, 105, 120), FONT_STYLE_LIGHT);
 
     /* ---- 6. Context menus ---- */
     if (st->ctx.active) {

@@ -1,7 +1,7 @@
 #include "app_terminal.h"
 #include "wm.h"
 #include "framebuffer.h"
-#include "font8x16.h"
+#include "font.h"
 #include "heap.h"
 #include "string.h"
 #include "command.h"
@@ -155,15 +155,9 @@ static void term_init(terminal_state_t *st) {
         st->pty->on_output = pty_terminal_on_output;
     }
 
-    /* STAX ASCII Banner in Smooth White -> Gray Gradient */
-    term_puts(st, "  ____ _____  _  __  __   ____  _   _ _____ _     _     \n", rgb565(255, 255, 255));
-    term_puts(st, " / ___|_   _|/ \\| \\ \\/ /  / ___|| | | | ____| |   | |    \n", rgb565(220, 225, 235));
-    term_puts(st, " \\___ \\ | | / _ \\  \\  /   \\___ \\| |_| |  _| | |   | |    \n", rgb565(185, 190, 205));
-    term_puts(st, "  ___) || |/ ___ \\ /  \\    ___) |  _  | |___| |___| |___ \n", rgb565(150, 155, 170));
-    term_puts(st, " |____/ |_/_/   \\_/_/\\_\\  |____/|_| |_|_____|_____|_____|\n", rgb565(115, 120, 135));
-    term_puts(st, " ---------------------------------------------------------\n", rgb565(65, 70, 85));
-    term_puts(st, "  STAX OS v2.0 | ARM926EJ-S | 32MB Memory | Concurrent Shell\n", rgb565(210, 215, 230));
-    term_puts(st, "  Type 'help' for commands | 'clear' to reset terminal\n\n", rgb565(130, 135, 150));
+    /* Clean, simple welcome message using natural font */
+    term_puts(st, "STAX Terminal\n", rgb565(240, 243, 250));
+    term_puts(st, "Type 'help' for available commands.\n\n", rgb565(140, 145, 160));
 }
 
 /* Redirection hook for console output */
@@ -172,13 +166,6 @@ static void term_console_hook(char c, void *ctx) {
     if (st) {
         term_putc(st, c, COLOR_WHITE);
     }
-}
-
-#include "font.h"
-
-/* Fast glyph rendering with Ubuntu Mono typography */
-static void draw_glyph(int px, int py, char c, uint16_t color, int min_x, int min_y, int max_x, int max_y) {
-    font_draw_char_clipped(px, py, c, color, FONT_STYLE_MONO, min_x, min_y, max_x, max_y);
 }
 
 void terminal_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
@@ -196,69 +183,63 @@ void terminal_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
 
     uint16_t theme_pri = theme_get_primary_accent();
 
-    /* Terminal Window Background (Dark Midnight Slate) */
-    fb_fillrect(cx, cy, cw, ch, rgb565(16, 18, 24));
+    /* Terminal Window Background (Clean Dark Slate) */
+    fb_fillrect(cx, cy, cw, ch, rgb565(15, 17, 23));
 
-    /* Top Shell Info Bar */
-    int top_bar_h = 22;
-    fb_fillrect(cx, cy, cw, top_bar_h, rgb565(24, 27, 36));
-    fb_drawline(cx, cy + top_bar_h - 1, cx + cw - 1, cy + top_bar_h - 1, rgb565(42, 48, 65));
-    
-    char pty_title[32];
-    strcpy(pty_title, "STAX Shell (pty0)");
-    if (st->pty) {
-        pty_title[15] = '0' + (st->pty->id % 10);
-    }
-    font_draw_text_clipped(cx + 10, cy + 3, pty_title, theme_pri, FONT_STYLE_REGULAR, cx, cy, cx + cw, cy + top_bar_h);
-    font_draw_text_clipped(cx + cw - 65, cy + 3, "1000Hz", rgb565(140, 150, 170), FONT_STYLE_REGULAR, cx, cy, cx + cw, cy + top_bar_h);
-
-    /* Cursor blink */
-    if (++st->blink_n >= 30) {
+    /* Cursor blink cadence */
+    if (++st->blink_n >= 25) {
         st->blink_n = 0;
         st->cur_on = !st->cur_on;
     }
 
-    int clip_top = cy + top_bar_h;
-    int clip_bot = cy + ch - 24;
+    int text_margin_x = cx + 12;
+    int clip_top = cy + 6;
+    int clip_bot = cy + ch - 30;
 
-    int text_area_h = ch - top_bar_h - 26;
+    int text_area_h = ch - 36;
     int max_rows = text_area_h / 16;
-    int max_cols = (cw - 12) / 8;
-    if (max_cols > TERM_COLS) max_cols = TERM_COLS;
     if (max_rows > TERM_ROWS) max_rows = TERM_ROWS;
 
-    /* Render ring buffer ending at st->head */
+    /* Render ring buffer ending at st->head using natural font */
     for (int r = 0; r < max_rows; r++) {
         int ring_row = (st->head - (max_rows - 1 - r) + TERM_ROWS * 2) % TERM_ROWS;
-        int py = cy + top_bar_h + 4 + r * 16;
-        for (int c = 0; c < max_cols; c++) {
+        int py = cy + 8 + r * 16;
+        int cur_x_pos = text_margin_x;
+
+        for (int c = 0; c < TERM_COLS; c++) {
             char ch_val = st->text[ring_row][c];
+            if (!ch_val) break;
             if (ch_val >= 32 && ch_val <= 126) {
-                draw_glyph(cx + 8 + c * 8, py, ch_val, st->color[ring_row][c], cx, clip_top, cx + cw, clip_bot);
+                int ch_w = font_get_char_width(ch_val, FONT_STYLE_REGULAR);
+                if (cur_x_pos + ch_w > cx + cw - 10) break;
+                font_draw_char_clipped(cur_x_pos, py, ch_val, st->color[ring_row][c], FONT_STYLE_REGULAR, cx + 6, clip_top, cx + cw - 6, clip_bot);
+                cur_x_pos += ch_w;
             }
         }
     }
 
     /* Bottom Command Input Bar */
-    int bar_y = cy + ch - 24;
-    fb_fillrect(cx, bar_y, cw, 24, rgb565(22, 25, 35));
-    fb_drawline(cx, bar_y, cx + cw - 1, bar_y, rgb565(42, 50, 70));
+    int bar_y = cy + ch - 26;
+    fb_fillrect(cx, bar_y, cw, 26, rgb565(19, 22, 30));
+    fb_drawline(cx, bar_y, cx + cw - 1, bar_y, rgb565(32, 36, 48));
 
-    /* Prompt + Input Line (Dynamic Theme Accent) */
-    const char *prompt = "stax@kernel:~$ ";
-    int px = cx + 8, py2 = bar_y + 4;
-    for (const char *p = prompt; *p; p++) {
-        draw_glyph(px, py2, *p, theme_pri, cx, bar_y, cx + cw, cy + ch);
-        px += 8;
-    }
+    /* Clean, simple prompt */
+    int px = cx + 12, py2 = bar_y + 5;
+    const char *prompt = "stax:~$ ";
+    font_draw_text(px, py2, prompt, theme_pri, FONT_STYLE_REGULAR);
+    px += font_get_string_width(prompt, FONT_STYLE_REGULAR);
 
+    /* User Input Buffer */
     for (int i = 0; i < st->input_pos; i++) {
-        draw_glyph(px, py2, st->input[i], COLOR_WHITE, cx, bar_y, cx + cw, cy + ch);
-        px += 8;
+        char in_c = st->input[i];
+        int ch_w = font_get_char_width(in_c, FONT_STYLE_REGULAR);
+        font_draw_char_clipped(px, py2, in_c, COLOR_WHITE, FONT_STYLE_REGULAR, cx, bar_y, cx + cw - 10, cy + ch);
+        px += ch_w;
     }
 
+    /* Clean vertical cursor line */
     if (st->cur_on) {
-        fb_fillrect(px, py2, 8, 16, theme_pri);
+        fb_fillrect(px, py2 + 1, 2, 13, theme_pri);
     }
 }
 
@@ -275,7 +256,7 @@ void terminal_key_event(struct window *win, char c) {
         st->input[st->input_pos] = '\0';
 
         /* Echo typed command with dynamic theme accent */
-        term_puts(st, "stax@kernel:~$ ", theme_get_primary_accent());
+        term_puts(st, "stax:~$ ", theme_get_primary_accent());
         term_puts(st, st->input, COLOR_WHITE);
         term_putc(st, '\n', COLOR_WHITE);
 

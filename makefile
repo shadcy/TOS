@@ -118,8 +118,7 @@ KERNEL_OBJS  := $(BUILD_DIR)/startup.o \
                 $(BUILD_DIR)/app_settings.o \
                 $(BUILD_DIR)/browser_html.o \
                 $(BUILD_DIR)/framebuffer.o \
-                $(BUILD_DIR)/font8x16.o \
-                $(BUILD_DIR)/ubuntu_font_data.o \
+                $(BUILD_DIR)/stacksans_font_data.o \
                 $(BUILD_DIR)/font.o \
                 $(BUILD_DIR)/icons.o \
                 $(BUILD_DIR)/gfx_console.o \

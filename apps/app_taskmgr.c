@@ -52,7 +52,7 @@ void taskmgr_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
     uint32_t used = total - free_mem;
 
     /* Memory Meter */
-    font_draw_text(cx + 10, cy + 6, "Memory Allocation", rgb565(30, 35, 50), FONT_STYLE_REGULAR);
+    font_draw_text(cx + 10, cy + 6, "Memory Allocation", rgb565(30, 35, 50), FONT_STYLE_BOLD);
     int pbar_x = cx + 10;
     int pbar_y = cy + 24;
     int pbar_w = cw - 20;
@@ -72,9 +72,9 @@ void taskmgr_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
     fb_fillrect(cx, hy, cw, th_h, rgb565(228, 232, 240));
     fb_drawline(cx, hy + th_h - 1, cx + cw - 1, hy + th_h - 1, rgb565(205, 210, 222));
 
-    font_draw_text(cx + 12, hy + 3, "Application / Window", rgb565(80, 85, 100), FONT_STYLE_REGULAR);
-    font_draw_text(cx + (cw * 55 / 100), hy + 3, "Status", rgb565(80, 85, 100), FONT_STYLE_REGULAR);
-    font_draw_text(cx + cw - 58, hy + 3, "Action", rgb565(80, 85, 100), FONT_STYLE_REGULAR);
+    font_draw_text(cx + 12, hy + 3, "Application / Window", rgb565(60, 65, 80), FONT_STYLE_BOLD);
+    font_draw_text(cx + (cw * 55 / 100), hy + 3, "Status", rgb565(60, 65, 80), FONT_STYLE_BOLD);
+    font_draw_text(cx + cw - 58, hy + 3, "Action", rgb565(60, 65, 80), FONT_STYLE_BOLD);
 
     /* Process Rows */
     int item_y = hy + th_h;
@@ -131,5 +131,5 @@ void taskmgr_draw_window(struct window *win, int cx, int cy, int cw, int ch) {
     fb_fillrect(cx, sb_y, cw, 18, rgb565(232, 236, 244));
     fb_drawline(cx, sb_y, cx + cw - 1, sb_y, rgb565(205, 210, 222));
 
-    font_draw_text(cx + 10, sb_y + 2, "1000Hz Preemptive Scheduler  |  Real-Time", rgb565(90, 95, 115), FONT_STYLE_REGULAR);
+    font_draw_text(cx + 10, sb_y + 2, "1000Hz Preemptive Scheduler  |  Real-Time", rgb565(90, 95, 115), FONT_STYLE_LIGHT);
 }
