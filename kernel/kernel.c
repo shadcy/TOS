@@ -69,8 +69,13 @@ void print_prompt(void) {
     }
 }
 
+#include "bsp.h"
+
 void kernel_main(void)
 {
+    /* Initialize Board Support Package (BSP) abstraction early */
+    bsp_early_init(NULL);
+
     /* ---- Initialize graphical console + keyboard + mouse + rtc ---- */
     gfx_console_init();  /* also initializes the framebuffer */
     kb_init();           /* enable PL050 PS/2 keyboard */

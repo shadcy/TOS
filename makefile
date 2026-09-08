@@ -97,6 +97,7 @@ KERNEL_OBJS  := $(BUILD_DIR)/startup.o \
                 $(BUILD_DIR)/process.o \
                 $(BUILD_DIR)/fat.o \
                 $(BUILD_DIR)/disk.o \
+                $(BUILD_DIR)/bsp_versatilepb.o \
                 $(BUILD_DIR)/irq.o \
                 $(BUILD_DIR)/keyboard.o \
                 $(BUILD_DIR)/mouse.o \
